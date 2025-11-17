@@ -16,10 +16,11 @@ urlpatterns = [
     # Login / Logout
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
-    path('logout/', views.user_logout, name='logout'),
-
 
     # Dashboards
     path('dashboard/client/', views.client_dashboard, name='client_dashboard'),
     path('dashboard/advocate/', views.advocate_dashboard, name='advocate_dashboard'),
+    
+    # Search
+    path('search/advocates/', views.search_advocates, name='search_advocates'),
 ]

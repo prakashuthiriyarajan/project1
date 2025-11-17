@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import User
+from django.db.models import Q
 
 
 # -------------------------
@@ -94,3 +95,32 @@ def client_dashboard(request):
 @login_required
 def advocate_dashboard(request):
     return render(request, "advocate_dashboard.html")
+
+
+# -------------------------
+# SEARCH ADVOCATES
+# -------------------------
+def search_advocates(request):
+    """
+    View to search and display advocates
+    """
+    query = request.GET.get('q', '')
+    
+    if query:
+        # Search for advocates by username, email, first_name, or last_name
+        advocates = User.objects.filter(
+            Q(role='advocate') &
+            (Q(username__icontains=query) |
+             Q(email__icontains=query) |
+             Q(first_name__icontains=query) |
+             Q(last_name__icontains=query))
+        )
+    else:
+        # Show all advocates if no search query
+        advocates = User.objects.filter(role='advocate', is_active_advocate=True)
+    
+    context = {
+        'advocates': advocates,
+        'query': query
+    }
+    return render(request, 'search_advocates.html', context)
