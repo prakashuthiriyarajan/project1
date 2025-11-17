@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to Book My Advocate</h1>
+
+<p>Select an option:</p>
+
+<a href="{% url 'login' %}">Login</a><br><br>
+<a href="{% url 'register_client' %}">Register as Client</a><br><br>
+<a href="{% url 'register_advocate' %}">Register as Advocate</a>
+{% endblock %}
