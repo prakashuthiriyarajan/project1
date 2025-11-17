@@ -23,4 +23,8 @@ urlpatterns = [
     
     # Search
     path('search/advocates/', views.search_advocates, name='search_advocates'),
+    
+    # Placeholder routes (to be implemented)
+    path('advocate/profile/edit/', views.edit_advocate_profile, name='edit_advocate_profile'),
+    path('booking/<int:booking_id>/', views.booking_detail, name='booking_detail'),
 ]
