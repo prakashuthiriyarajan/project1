@@ -1,6 +1,6 @@
 """
 Path: bookmyadvocate/main/models.py
-Complete models with all required fields
+FIXED: Bar Council Number as unique identifier for advocates
 """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -15,6 +15,9 @@ class User(AbstractUser):
     is_active_advocate = models.BooleanField(default=False)
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    
+    # ADDED: Bar Council Number for advocates (unique identifier)
+    bar_council_number = models.CharField(max_length=100, blank=True, null=True, unique=True)
 
     def __str__(self):
         return f"{self.username} ({self.role})"
@@ -39,7 +42,6 @@ class AdvocateProfile(models.Model):
     location = models.CharField(max_length=150, blank=True)
     bio = models.TextField(blank=True)
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=500.00)
-    bar_council_number = models.CharField(max_length=100, blank=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     total_cases = models.PositiveIntegerField(default=0)
     

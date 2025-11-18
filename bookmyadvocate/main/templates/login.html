@@ -3,23 +3,52 @@
 {% block content %}
 
 <div class="row justify-content-center mt-5">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <div class="card shadow-lg">
             <div class="card-header text-center">
                 <h3 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Login to Your Account</h3>
             </div>
             <div class="card-body p-4">
-                <form method="POST">
+                <form method="POST" id="loginForm">
                     {% csrf_token %}
                     
+                    <!-- Role Selection -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">
-                            <i class="bi bi-person"></i> Username
+                            <i class="bi bi-person-badge"></i> I am a:
                         </label>
-                        <input type="text" name="username" class="form-control form-control-lg" 
-                               placeholder="Enter your username" required autofocus>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="role" id="roleClient" 
+                                       value="client" checked onchange="updateLoginFields()">
+                                <label class="form-check-label" for="roleClient">
+                                    <i class="bi bi-person"></i> Client
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="role" id="roleAdvocate" 
+                                       value="advocate" onchange="updateLoginFields()">
+                                <label class="form-check-label" for="roleAdvocate">
+                                    <i class="bi bi-briefcase"></i> Advocate
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Credential Field (Dynamic) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" id="credentialLabel">
+                            <i class="bi bi-envelope"></i> Email Address
+                        </label>
+                        <input type="text" name="credential" id="credentialInput" 
+                               class="form-control form-control-lg" 
+                               placeholder="Enter your email" required autofocus>
+                        <small class="text-muted" id="credentialHelp">
+                            Enter the email you used during registration
+                        </small>
+                    </div>
+
+                    <!-- Password Field -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">
                             <i class="bi bi-lock"></i> Password
@@ -48,5 +77,53 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateLoginFields() {
+    const role = document.querySelector('input[name="role"]:checked').value;
+    const credentialLabel = document.getElementById('credentialLabel');
+    const credentialInput = document.getElementById('credentialInput');
+    const credentialHelp = document.getElementById('credentialHelp');
+    
+    if (role === 'client') {
+        credentialLabel.innerHTML = '<i class="bi bi-envelope"></i> Email Address';
+        credentialInput.type = 'email';
+        credentialInput.placeholder = 'Enter your email';
+        credentialHelp.textContent = 'Enter the email you used during registration';
+    } else {
+        credentialLabel.innerHTML = '<i class="bi bi-award"></i> Bar Council Number';
+        credentialInput.type = 'text';
+        credentialInput.placeholder = 'Enter your Bar Council Number';
+        credentialHelp.textContent = 'Enter your Bar Council registration number';
+    }
+    
+    credentialInput.value = '';
+    credentialInput.focus();
+}
+</script>
+
+<style>
+.form-check-input:checked {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.form-check {
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-check:has(.form-check-input:checked) {
+    border-color: #3498db;
+    background-color: #f0f8ff;
+}
+</style>
 
 {% endblock %}
