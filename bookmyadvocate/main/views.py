@@ -188,18 +188,26 @@ def client_dashboard(request):
 # -------------------------
 # ADVOCATE DASHBOARD
 # -------------------------
+# -------------------------
+# ADVOCATE DASHBOARD
+# -------------------------
 @login_required
 def advocate_dashboard(request):
     if request.user.role != 'advocate':
-        return redirect('client_dashboard')
+        messages.error(request, "Access denied!")
+        return redirect("home")
     
-    profile, created = AdvocateProfile.objects.get_or_create(user=request.user)
+    # Get advocate's bookings
     bookings = Booking.objects.filter(advocate=request.user).order_by('-created_at')
     
-    return render(request, "advocate_dashboard.html", {
+    # Get advocate's profile
+    profile = request.user.advocate_profile
+    
+    context = {
         'bookings': bookings,
         'profile': profile
-    })
+    }
+    return render(request, "advocate_dashboard.html", context)
 
 
 # -------------------------
