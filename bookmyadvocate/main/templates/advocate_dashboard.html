@@ -1,8 +1,180 @@
-{% extends 'main/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
-<h2>Advocate Dashboard</h2>
-<p>Welcome, Advocate {{ user.username }}!</p>
 
-<div class="alert alert-info">Advocate features coming soon…</div>
+<div class="mb-4">
+    <h2 class="section-title">
+        <i class="bi bi-briefcase"></i> Advocate Dashboard
+    </h2>
+    <p class="text-muted">Welcome back, Advocate {{ user.email }}!</p>
+</div>
+
+<!-- Profile Status Alert -->
+{% if not user.is_active_advocate %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <strong>Profile Incomplete!</strong> Please complete your profile to start receiving consultation requests.
+    <a href="{% url 'edit_advocate_profile' %}" class="alert-link">Complete Profile Now</a>
+</div>
+{% endif %}
+
+<!-- Statistics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <i class="bi bi-calendar-check" style="font-size: 2.5rem; opacity: 0.9;"></i>
+            <div class="stat-number">{{ bookings.count }}</div>
+            <div>Total Bookings</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <i class="bi bi-hourglass-split" style="font-size: 2.5rem; opacity: 0.9;"></i>
+            <div class="stat-number">{{ bookings|length }}</div>
+            <div>Pending Requests</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <i class="bi bi-star-fill" style="font-size: 2.5rem; opacity: 0.9;"></i>
+            <div class="stat-number">{{ profile.rating|floatformat:1 }}</div>
+            <div>Average Rating</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <i class="bi bi-currency-rupee" style="font-size: 2.5rem; opacity: 0.9;"></i>
+            <div class="stat-number">{{ profile.consultation_fee }}</div>
+            <div>Consultation Fee</div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Summary -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-person-badge"></i> Profile Summary</h5>
+        <a href="{% url 'edit_advocate_profile' %}" class="btn btn-primary-custom btn-sm">
+            <i class="bi bi-pencil"></i> Edit Profile
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong><i class="bi bi-award"></i> Specialization:</strong> 
+                    {{ profile.get_specialization_display|default:"Not Set" }}
+                </p>
+                <p><strong><i class="bi bi-briefcase"></i> Experience:</strong> 
+                    {{ profile.experience_years }} years
+                </p>
+                <p><strong><i class="bi bi-geo-alt"></i> Location:</strong> 
+                    {{ profile.location|default:"Not Set" }}
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p><strong><i class="bi bi-award-fill"></i> Bar Council No:</strong> 
+                    {{ user.bar_council_number|default:"Not Set" }}
+                </p>
+                <p><strong><i class="bi bi-folder"></i> Total Cases:</strong> 
+                    {{ profile.total_cases }}
+                </p>
+                <p><strong><i class="bi bi-star-fill text-warning"></i> Rating:</strong> 
+                    {{ profile.rating|floatformat:1 }}/5.0
+                </p>
+            </div>
+        </div>
+        {% if profile.bio %}
+        <div class="mt-3">
+            <strong><i class="bi bi-info-circle"></i> Bio:</strong>
+            <p class="text-muted">{{ profile.bio }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Consultation Requests -->
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h4 class="mb-0"><i class="bi bi-calendar3"></i> Consultation Requests</h4>
+    </div>
+    <div class="card-body">
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Date & Time</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-2" 
+                                         style="width: 40px; height: 40px;">
+                                        {{ booking.client.email.0|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ booking.client.email }}</div>
+                                        <small class="text-muted">Client</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div><i class="bi bi-calendar"></i> {{ booking.date|date:"M d, Y" }}</div>
+                                <small class="text-muted"><i class="bi bi-clock"></i> {{ booking.time|time:"g:i A" }}</small>
+                            </td>
+                            <td>{{ booking.purpose|truncatewords:5 }}</td>
+                            <td>
+                                {% if booking.status == 'pending' %}
+                                    <span class="badge badge-pending">
+                                        <i class="bi bi-hourglass-split"></i> Pending
+                                    </span>
+                                {% elif booking.status == 'accepted' %}
+                                    <span class="badge badge-accepted">
+                                        <i class="bi bi-check-circle"></i> Accepted
+                                    </span>
+                                {% elif booking.status == 'completed' %}
+                                    <span class="badge badge-completed">
+                                        <i class="bi bi-check-all"></i> Completed
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-rejected">
+                                        <i class="bi bi-x-circle"></i> Rejected
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3 text-muted">No Consultation Requests</h4>
+                <p class="text-muted">You will see consultation requests from clients here</p>
+                {% if not user.is_active_advocate %}
+                <a href="{% url 'edit_advocate_profile' %}" class="btn btn-primary-custom">
+                    <i class="bi bi-pencil"></i> Complete Your Profile
+                </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}

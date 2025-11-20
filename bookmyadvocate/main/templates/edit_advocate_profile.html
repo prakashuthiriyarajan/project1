@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="bi bi-person-gear"></i> Edit Advocate Profile
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Complete your profile</strong> to start receiving consultation requests from clients.
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-award"></i> Specialization
+                            </label>
+                            <select name="specialization" class="form-select" required>
+                                <option value="">-- Select Specialization --</option>
+                                <option value="criminal" {% if profile.specialization == 'criminal' %}selected{% endif %}>Criminal Law</option>
+                                <option value="civil" {% if profile.specialization == 'civil' %}selected{% endif %}>Civil Law</option>
+                                <option value="corporate" {% if profile.specialization == 'corporate' %}selected{% endif %}>Corporate Law</option>
+                                <option value="family" {% if profile.specialization == 'family' %}selected{% endif %}>Family Law</option>
+                                <option value="tax" {% if profile.specialization == 'tax' %}selected{% endif %}>Tax Law</option>
+                                <option value="property" {% if profile.specialization == 'property' %}selected{% endif %}>Property Law</option>
+                                <option value="labor" {% if profile.specialization == 'labor' %}selected{% endif %}>Labor Law</option>
+                                <option value="intellectual" {% if profile.specialization == 'intellectual' %}selected{% endif %}>Intellectual Property</option>
+                                <option value="other" {% if profile.specialization == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-briefcase"></i> Experience (years)
+                            </label>
+                            <input type="number" name="experience_years" class="form-control" 
+                                   value="{{ profile.experience_years }}" min="0" max="50" required
+                                   placeholder="e.g., 5">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-geo-alt"></i> Location
+                            </label>
+                            <input type="text" name="location" class="form-control" 
+                                   value="{{ profile.location }}" 
+                                   placeholder="e.g., Mumbai, Maharashtra">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-currency-rupee"></i> Consultation Fee (₹)
+                            </label>
+                            <input type="number" name="consultation_fee" class="form-control" 
+                                   value="{{ profile.consultation_fee }}" min="100" step="50" required
+                                   placeholder="e.g., 1000">
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-info-circle"></i> Bio / About You
+                            </label>
+                            <textarea name="bio" class="form-control" rows="4" 
+                                      placeholder="Tell clients about your expertise, experience, and specialties...">{{ profile.bio }}</textarea>
+                            <small class="text-muted">This will be visible to clients</small>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success-custom btn-lg flex-grow-1">
+                            <i class="bi bi-save"></i> Save Profile
+                        </button>
+                        <a href="{% url 'advocate_dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Profile Preview -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-eye"></i> Current Profile Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Bar Council Number:</strong> {{ user.bar_council_number }}</p>
+                        <p><strong>Phone:</strong> {{ user.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Specialization:</strong> {{ profile.get_specialization_display|default:"Not set" }}</p>
+                        <p><strong>Experience:</strong> {{ profile.experience_years }} years</p>
+                        <p><strong>Location:</strong> {{ profile.location|default:"Not set" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control, .form-select {
+    border: 2px solid #e0e0e0;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+</style>
+
+{% endblock %}
